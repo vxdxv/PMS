@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session,render_template,redirect
 import mysql.connector
 from mysql.connector import Error
 import os
@@ -22,7 +22,7 @@ db_config = {
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return jsonify({'message': 'Logged out successfully'}), 200
+    return redirect('/')
 #approve and reject application endpoint
 #add max applicants,deadine,skills required
 #professor-add areas of interest
@@ -86,9 +86,18 @@ def init_db():
 init_db()
 
 # Authentication routes
+@app.route('/')
+def default():
+    return render_template("login.html")
+
+
+@app.route('/register')
+def get_register():
+    return render_template("register.html")
+
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.form  # Use form data instead of JSON
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
@@ -99,16 +108,18 @@ def register():
         cursor.execute('INSERT INTO users (email, password, name, role) VALUES (%s, %s, %s, %s)',
                      (data['email'], data['password'], data.get('name'), data['role']))
         connection.commit()
-        return jsonify({'message': 'Registration successful'}), 201
+        return redirect("/")  # Redirect after successful registration
     except Error as e:
         return jsonify({'error': str(e)}), 400
     finally:
         cursor.close()
         connection.close()
+       
+
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.form
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
@@ -130,6 +141,100 @@ def login():
     finally:
         cursor.close()
         connection.close()
+        return redirect("/student-dashboard")
+
+@app.route('/student-dashboard', methods=['GET'])
+def student_dashboard():
+    if 'user_id' not in session or session['role'] != 'student':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = connection.cursor(dictionary=True)
+    response = {}  # Declare response early so it's always defined
+
+    try:
+        # Fetch all applications for the logged-in student
+        cursor.execute('SELECT * FROM applications WHERE student_id= %s', (session['user_id'],))
+        applications = cursor.fetchall()
+        print(applications)
+        accepted_projects=0
+        accepted_projects_list={}
+        pending_applications=0
+        pending_projects_list={}
+        # Get all projects
+        cursor.execute('SELECT * FROM projects')
+        projects = cursor.fetchall()
+        if(len(applications)>0):
+            accepted_applications_list = [app for app in applications if app['status'] == 'accepted']
+            pending_applications_list = [app for app in applications if app['status'] == 'pending']
+
+            accepted_projects = len(accepted_applications_list)
+            pending_applications = len(pending_applications_list)
+
+        # Get project ids from accepted and pending apps
+            accepted_project_ids = [app['project_id'] for app in accepted_applications_list]
+            pending_project_ids = [app['project_id'] for app in pending_applications_list]
+
+        
+
+        # Filter projects based on accepted/pending status
+            accepted_projects_list = [p for p in projects if p['project_id'] in accepted_project_ids]
+            pending_projects_list = [p for p in projects if p['project_id'] in pending_project_ids]
+        
+
+        # Filter accepted and pending applications
+       
+
+        # Get student name
+        cursor.execute("SELECT name FROM users WHERE id= %s", (session['user_id'],))
+        name_result = cursor.fetchone()
+        student_name = name_result['name'] if name_result else 'Unknown'
+
+        user = {
+            'name': student_name,
+            'accepted_projects': accepted_projects,
+            'accepted_projects_list': accepted_projects_list,
+            'pending_applications': pending_applications,
+            'pending_projects_list': pending_projects_list
+        }
+
+        response = {
+            'user': user,
+            'available_projects': projects
+        }
+
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+    return render_template("student_dashboard.html", response=response)
+
+
+@app.route('/professor-dashboard', methods=['GET'])
+def professor_dashboard():
+    if 'user_id' not in session or session['role'] != 'student':
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+    
+    cursor = connection.cursor(dictionary=True)
+    
+    try:
+        cursor.execute('SELECT * FROM projects WHERE professor_id= %s', (session['user_id'],))
+        projects = cursor.fetchall()
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+        return render_template("professor_dashboard.html", projects=projects)
 
 # Student routes
 @app.route('/student/profile', methods=['GET'])
@@ -146,14 +251,27 @@ def student_profile():
     try:
         cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
         user = cursor.fetchone()
-        return jsonify(user), 200
+        cursor.execute('SELECT * FROM projects WHERE student_id = %s', (session['user_id'],))
+        projects = cursor.fetchall()
+        if projects:
+            user['projects'] = projects
+        else:   
+            user['projects'] = []
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
         cursor.close()
         connection.close()
+        return render_template("student_profile.html",user=user)
 
 #Add project route
+@app.route('/add-projects', methods=['GET'])
+def add_projects():
+    if 'user_id' not in session or session['role'] != 'professor':
+        return jsonify({'error': 'Unauthorized'}), 401
+    return render_template("add_project.html")
+    
+
 @app.route('/add-project', methods=['POST'])
 def add_project():
     data = request.get_json()
@@ -235,12 +353,37 @@ def professor_profile():
     try:
         cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
         user = cursor.fetchone()
-        return jsonify(user), 200
+        
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
         cursor.close()
         connection.close()
+        return render_template("professor_profile.html", user=user)
+    
+    
+@app.route('/update-profile-student')
+def update_profile_student():
+    if 'user_id' not in session or session['role'] != 'student':
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+    
+    cursor = connection.cursor(dictionary=True)
+    
+    try:
+        cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
+        user = cursor.fetchone()
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+        return render_template("update_profile.html",user=user)
+    
+
 
 @app.route('/professor/projects', methods=['GET'])
 def get_professor_projects():
@@ -262,6 +405,9 @@ def get_professor_projects():
     finally:
         cursor.close()
         connection.close()
+@app.route('/projects/<int:project_id>', methods=['GET'])
+def get_project(project_id):
+    return render_template("manageProject.html")
 
 @app.route('/projects/<int:project_id>', methods=['PUT'])
 def update_project(project_id):
@@ -283,12 +429,13 @@ def update_project(project_id):
         ''', (data.get('title'), data.get('description'), data.get('domain'), 
               project_id, session['user_id']))
         connection.commit()
-        return jsonify({'message': 'Project updated'}), 200
+        
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
         cursor.close()
         connection.close()
+        return render_template("manageProject.html")
 
 @app.route('/projects/<int:project_id>/close', methods=['POST'])
 def close_project(project_id):

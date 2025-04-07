@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="../static/student_dashboard.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>TaskFlow</h2>
+        <nav>
+            <ul>
+                <li><a href="">Dashboard</a></li>
+                <li><a href="/student/profile">View Profile</a></li>
+                <li><form action="/logout", method="POST">
+                    <button type="submit">Logout</button>
+                </form></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="dashboard-container">
+        <header class="top-banner">
+            <h2>Hey, {{ response.user.name }}!</h2>
+        </header>
+
+        <section class="overview">
+            <div class="overview-box">
+                <h3>Accepted Applications</h3>
+                <p>{{ response.user.accepted_projects }}</p>
+            </div>
+            <div class="overview-box">
+                <h3>Pending Applications</h3>
+                <p>{{ response.user.pending_applications }}</p>
+            </div>
+        </section>
+
+        <section class="projects-list">
+            <h2>Accepted Applications</h2>
+            <div class="projects-grid">
+                {% for project in response.user.accepted_projects_list %}
+                    <div class="project-card">
+                        <h3>{{ project.title }}</h3>
+                        <p><strong>Domain:</strong> {{ project.domain }}</p>
+                        <p><strong>Professor:</strong> {{ project.professor }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="projects-list">
+            <h2>Pending Applications</h2>
+            <div class="projects-grid">
+                {% for project in response.user.pending_projects_list %}
+                    <div class="project-card">
+                        <h3>{{ project.title }}</h3>
+                        <p><strong>Domain:</strong> {{ project.domain }}</p>
+                        <p><strong>Professor:</strong> {{ project.professor }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="projects-list">
+            <h2>Available Projects</h2>
+            <div class="filters">
+                <input type="text" id="filter-title" placeholder="Filter by Title">
+                <input type="text" id="filter-domain" placeholder="Filter by Domain">
+                <button onclick="filterProjects()">Apply Filters</button>
+            </div>
+            <div class="projects-grid">
+                {% for project in response.available_projects %}
+                    <a class="project-card clickable-card" href="/projects/{{ project.id }}">
+                        <h3>{{ project.title }}</h3>
+                        <p><strong>Domain:</strong> {{ project.domain }}</p>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Project Collaboration</title>
+    <link rel="stylesheet" href="../static/register.css">
+</head>
+<body>
+    <div class="register-container">
+        <h2>Create an Account</h2>
+        <form action="/register" method="POST">
+            <div class="input-group">
+                <label for="name"> Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required>
+            </div>
+            <div class="input-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="" disabled selected>Select your role</option>
+                    <option value="student">Student</option>
+                    <option value="professor">Professor</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Register</button>
+            <p class="login-link">Already have an account? <a href="/">Login here</a></p>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile</title>
+  <link rel="stylesheet" href="../static/update_profile.css" />
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const projectsContainer = document.getElementById("projects-container");
+      const addProjectBtn = document.getElementById("add-project-btn");
+
+      addProjectBtn.addEventListener("click", function () {
+        const projectDiv = document.createElement("div");
+        projectDiv.classList.add("project-item");
+
+        projectDiv.innerHTML = `
+          <input type="text" name="project_titles[]" placeholder="Project Title" required>
+          <input type="text" name="project_links[]" placeholder="Project Link (GitHub, etc.)" required>
+          <button type="button" class="remove-project-btn">Remove</button>
+        `;
+
+        projectDiv.querySelector(".remove-project-btn").addEventListener("click", function () {
+          projectDiv.remove();
+        });
+
+        projectsContainer.appendChild(projectDiv);
+      });
+
+      // Toggle password fields
+      const togglePassword = document.getElementById("toggle-password");
+      const passwordFields = document.getElementById("password-fields");
+
+      togglePassword.addEventListener("change", function () {
+        passwordFields.style.display = this.checked ? "block" : "none";
+        document.getElementById("password").disabled = !this.checked;
+        document.getElementById("confirm_password").disabled = !this.checked;
+      });
+    });
+  </script>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <button onclick="window.location.href='student_dashboard.html'">Dashboard</button>
+    <button class="logout-btn" onclick="window.location.href='login.html'">Logout</button>
+  </header>
+
+  <!-- <aside class="sidebar">
+    <h2>TaskFlow</h2>
+    <nav>
+        <ul>
+            <li><a href="student_dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">View Profile</a></li>
+            <li><a href="login.html">Logout</a></li>
+        </ul>
+    </nav>
+  </aside> -->
+
+  <main class="profile-edit-container">
+    <h2>Edit Profile</h2>
+
+    <form method="POST" action="/update_profile">
+      <!-- Name -->
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" value="{{ user.name }}" required />
+
+      <!-- Email -->
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{ user.email }}" required />
+
+      <!-- Toggle Change Password -->
+      <label class="toggle-container">
+        <input type="checkbox" id="toggle-password" />
+        Change Password<br>
+      </label>
+
+  
+
+      <!-- Password Fields (Hidden by default) -->
+      <div id="password-fields" style="display: none;">
+        <br>
+        <label for="password">New Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter new password" disabled />
+        <br>
+        <br>
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" disabled />
+      </div>
+
+      <!-- Skills -->
+      <label for="skills">Skills</label>
+      <textarea id="skills" name="skills" required>{{ user.skills }}</textarea>
+
+      <!-- Resume Link -->
+      <label for="resume">Resume Link</label>
+      <input type="url" id="resume" name="resume" value="{{ user.resume }}" required />
+
+      <!-- Projects -->
+      <label>Projects</label>
+      <div id="projects-container">
+        {% for project in user.projects %}
+          <div class="project-item">
+            <input type="text" name="project_titles[]" value="{{ project.title }}" required />
+            <input type="text" name="project_links[]" value="{{ project.link }}" required />
+            <button type="button" class="remove-project-btn" onclick="this.parentElement.remove()">Remove</button>
+          </div>
+        {% endfor %}
+      </div>
+      <button type="button" id="add-project-btn">Add Project</button>
+
+      <!-- Save Button -->
+      <button type="submit" class="save-btn">Save Changes</button>
+    </form>
+  </main>
+
+</body>
+</html>

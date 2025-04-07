@@ -1,0 +1,175 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+  }
+  
+  /* Top Navigation */
+  .top-nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background: #222;
+    color: white;
+    padding: 10px 20px;
+  }
+  
+  .top-nav button {
+    background: #fff;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+
+  .sidebar {
+    width: 220px;
+    background-color: #fff;
+    padding: 20px;
+    height: 200vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+    color: #5A5A5A;
+    text-align: center;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar nav ul li {
+    padding: 10px 0;
+}
+
+.sidebar nav ul li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.sidebar nav ul li a:hover {
+    background-color: #e3e3e3;
+}
+  
+  /* Profile Edit Container */
+  .profile-edit-container {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Headings */
+  .profile-edit-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Form Fields */
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-top: 15px;
+  }
+  
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  textarea {
+    height: 80px;
+    resize: vertical;
+  }
+  
+  /* Projects */
+  #projects-container {
+    margin-top: 10px;
+  }
+  
+  .project-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+    background: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .project-item input {
+    width: 100%;
+  }
+  
+  .remove-project-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  
+  /* Buttons */
+  #add-project-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+  .save-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+  }
+  
+  /* Align the Change Password checkbox and label */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;  /* Space between checkbox and label */
+    margin-top: 15px;
+  }
+  
+  /* Ensure checkbox aligns properly */
+  .toggle-container input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0; /* Remove unwanted margins */
+  }
+  

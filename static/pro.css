@@ -1,0 +1,143 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white; /* Light Blue */
+    display: flex;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.menu-icon {
+    cursor: pointer;
+    font-size: 30px; 
+    padding: 10px; 
+    background-color: #f0f0f0;
+    border-radius: 5px; 
+    transition: background-color 0.3s;
+}
+
+.menu-icon:hover {
+    background-color: #e0e0e0; 
+}
+
+.menu-icon i {
+    color: #333; 
+    font-weight: bold; 
+}
+
+.navbar {
+    background-color: #D5006D; /* Dark Pink */
+    color: white;
+    width: 250px;
+    padding: 20px;
+}
+
+.navbar h2 {
+    margin: 0;
+    padding-bottom: 20px;
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.navbar ul li {
+    margin: 15px 0;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.profile-box {
+    background-color:#b3b3ff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.profile-box h1 {
+    font-size: 2.5em; /* Large size for name */
+    margin: 0;
+}
+
+.roll-number {
+    font-size: 0.9em; /* Smaller size for roll number */
+    color: gray;
+}
+
+h2 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.overview {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.overview-box {
+    background-color: #C7E6FF;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    margin: 0 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.overview-box:hover, .project-box:hover {
+    background-color: #A0C4FF; /* Darker shade on hover */
+    transform: scale(1.02); /* Slightly enlarge on hover */
+}
+
+.overview-box h3, .project-box h3 {
+    margin: 0;
+}
+
+.overview-box p, .project-box p {
+    margin: 5px 0 0;
+}
+
+.projects {
+    display: flex;
+    flex-direction: column; /* Stack project boxes vertically */
+}
+
+.project-box {
+    background-color: #C7E6FF;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 10px 0; /* Add margin to top and bottom for spacing */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.project-box:hover {
+    background-color: #A0C4FF; /* Darker shade on hover */
+    transform: scale(1.02); /* Slightly enlarge on hover */
+}
+
+.project-box h3 {
+    margin: 0;
+}
+
+.project-box p {
+    margin: 5px 0 0;
+}

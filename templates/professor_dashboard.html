@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../static/professor_dashboard.css">
+    <style>
+        .navbar {
+            display: none;
+        }
+        .navbar.active {
+            display: block; 
+        }
+        .menu-icon {
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="menu-icon"><i class="fas fa-bars"></i></div>
+        <h2>TaskFlow</h2>
+        <nav>
+            <ul>
+                <li><a href="professor_dashboard.html">Dashboard</a></li>
+                <li><a href="professor_profile.html">View Profile</a></li>
+                <li><a href="Create.html">Create Project</a></li>
+                <li><a href="manageProject.html">Manage Projects</a></li>
+                <li><a href="login.html">Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="dashboard-container">
+        <header class="top-banner">
+            <h2>Hey, {{ user.name }}!</h2>
+        </header>
+
+        <section class="overview">
+            <div class="overview-box">
+                <h3> Applications Accepted </h3>
+                <p>{{ user.accepted_applications }}</p>
+            </div>
+            <div class="overview-box">
+                <h3> Applications to review </h3>
+                <p>{{ user.pending_applications }}</p>
+            </div>
+        </section>
+
+        <section class="projects-list">
+            <h2>Applications Accepted</h2>
+            <div class="projects-grid">
+                {% for appln in user.accepted_applications_list %}
+                    <div class="project-card">
+                        <h3>{{ project.title }}</h3>
+                        <p><strong>Domain:</strong> {{ project.domain }}</p>
+                        <p><strong>Student Name:</strong> {{ student.name }}</p>
+                        <p><strong>Resume:</strong> 
+                            <a href="{{ student.resume }}" target="_blank">View Resume</a>
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="projects-list">
+            <h2>Applications to review</h2>
+            <div class="projects-grid">
+                {% for appln in user.pending_applications_list %}
+                    <div class="project-card">
+                        <h3>{{ project.title }}</h3>
+                        <p><strong>Domain:</strong> {{ project.domain }}</p>
+                        <p><strong>Student Name:</strong> {{ student.name }}</p>
+                        <p><strong>Resume:</strong> 
+                            <a href="{{ student.resume }}" target="_blank">View Resume</a>
+                        </p>
+                        <button class="accept" onclick=""> Accept </button>
+                        <button class="reject" onclick=""> Reject </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuIcon = document.querySelector('.menu-icon');
+        const navbar = document.querySelector('.navbar');
+
+        menuIcon.addEventListener('click', function() {
+            navbar.classList.toggle('active'); 
+        });
+    });
+</script>
