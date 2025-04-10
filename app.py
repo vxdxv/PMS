@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session,render_template,redirect
+from flask import Flask, request, jsonify, session,render_template,redirect,flash
 import mysql.connector
 from mysql.connector import Error
 import os
@@ -13,7 +13,7 @@ app.secret_key = 'SECRET_KEY'
 db_config = {
     'host': "localhost",
     'user': "root",
-    'password': "B220584cs*",
+    'password': "pass",
     'database': "world"
 }
 
@@ -361,28 +361,63 @@ def professor_profile():
         connection.close()
         return render_template("professor_profile.html", user=user)
     
-    
-@app.route('/update-profile-student')
+@app.route('/update-profile-student', methods=['GET', 'POST'])
 def update_profile_student():
     if 'user_id' not in session or session['role'] != 'student':
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
-    
+
     cursor = connection.cursor(dictionary=True)
-    
-    try:
-        cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
-        user = cursor.fetchone()
-    except Error as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cursor.close()
-        connection.close()
-        return render_template("update_profile.html",user=user)
-    
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        skills = request.form.get('skills')
+        resume_link = request.form.get('resume_link')
+
+        try:
+            # Try to add the columns if they don't exist (won't error if already there)
+            try:
+                cursor.execute("ALTER TABLE users ADD COLUMN skills TEXT")
+            except mysql.connector.Error as e:
+                if "Duplicate column name" not in str(e):
+                    raise
+
+            try:
+                cursor.execute("ALTER TABLE users ADD COLUMN resume_link VARCHAR(255)")
+            except mysql.connector.Error as e:
+                if "Duplicate column name" not in str(e):
+                    raise
+
+        # Now update the values
+            cursor.execute("""
+                UPDATE users 
+                SET name = %s, email = %s, skills = %s, resume_link = %s 
+                WHERE id = %s
+            """, (name, email, skills, resume_link, session['user_id']))
+            connection.commit()
+            flash('Profile updated successfully!')
+
+        except Error as e:
+            return jsonify({'error': str(e)}), 500
+        finally:
+            cursor.close()
+            connection.close()
+            return redirect('/student/profile')
+    else:
+        try:
+            cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
+            user = cursor.fetchone()
+        except Error as e:
+            return jsonify({'error': str(e)}), 500
+        finally:
+            cursor.close()
+            connection.close()
+            return render_template("update_profile.html", user=user)
+
 
 
 @app.route('/professor/projects', methods=['GET'])

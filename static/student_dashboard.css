@@ -43,7 +43,18 @@ body {
     background-color: #e3e3e3;
 }
 
+.sidebar button {
+    background-color: #fff;
+    color: #333;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
+.sidebar button:hover {
+    background-color: #e3e3e3;
+}
 /* Top Banner */
 .top-banner {
     background: linear-gradient(90deg, #ff7eb3, #ff758c, #ff7eb3);
