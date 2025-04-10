@@ -5,26 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Student Profile</title>
     <link rel="stylesheet" href="../static/professor_profile.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .navbar {
+            display: none;
+        }
+        .navbar.active {
+            display: block; 
+        }
+        .menu-icon {
+            cursor: pointer; 
+        }
+    </style>
 </head>
-
 <body>
-    <!-- Top Navigation --> 
-    <header class="top-nav">
-        <button onclick="window.location.href='professor_dashboard.html'">Dashboard</button>
-        <button onclick="window.location.href='update_profile_prof.html'">Update Profile</button>
-        <button onclick="window.location.href='login.html'">Logout</button>
-    </header>
-
-    <!-- <aside class="sidebar">
-        <h2>TaskFlow</h2>
-        <nav>
+    <div class="menu-icon"><i class="fas fa-bars"></i></div>
+        <nav class="navbar">
+            <h2>Dashboard</h2>
             <ul>
-                <li><a href="student_dashboard.html">Dashboard</a></li>
-                <li><a href="update_profile.html">Update Profile</a></li>
+                <li><a href="professor_dashboard.html">Dashboard</a></li>
+                <li><a href="professor_profile.html">View Profile</a></li>
+                <li><a href="Create.html">Create Project</a></li>
+                <li><a href="manageProject.html">Manage Projects</a></li>
                 <li><a href="login.html">Logout</a></li>
             </ul>
+            <ul>
+                <li><a href="logout.html" class="logout">Logout</a></li>
+            </ul>
         </nav>
-    </aside> --> 
+
 
     <!-- Main Profile Section -->
     <main class="profile">
@@ -66,3 +75,15 @@
 
 </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuIcon = document.querySelector('.menu-icon');
+        const navbar = document.querySelector('.navbar');
+
+        menuIcon.addEventListener('click', function() {
+            navbar.classList.toggle('active'); 
+        });
+    });
+</script>
+
