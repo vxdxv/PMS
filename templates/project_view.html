@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ project.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='project.css') }}">
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuIcon = document.querySelector('.menu-icon');
+            const navbar = document.querySelector('.navbar');
+            const mainContent = document.querySelector('.main-content');
+
+            menuIcon.addEventListener('click', function() {
+                navbar.classList.toggle('active');
+                mainContent.classList.toggle('shifted');
+            });
+        });
+    </script>
+</head>
+<body>
+
+<div class="menu-icon">
+    <i class="fas fa-bars"></i>
+</div>
+<div class="container">
+    <nav class="navbar">
+        <h2>TaskFlow</h2>
+        <ul>
+            <li><a href="/student-dashboard">Dashboard</a></li>
+            <li><a href="/student/profile">View Profile</a></li>
+        </ul>
+        <ul>
+            <li><form action="/logout", method="POST">
+                <button type="submit">Logout</button>
+            </form></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <h1>{{ project.title }}</h1>
+        <p class="small-text">{{ project.applicants or '1652' }} Applicants</p>
+        <div class="project-info">
+            <div class="slots-left">
+                <strong>Only {{ 3 - (project.applicants|default(0) % 3) }} Slots Left!</strong>
+            </div>
+        </div>
+
+        <h2>Project Details</h2>
+        <hr>
+        <div class="project-detail">
+            <strong>Professor:</strong> {{ project.professor_name }}
+        </div>
+        <hr>
+        <div class="project-detail">
+            <strong>Role:</strong> Project Manager
+        </div>
+        <hr>
+        <div class="project-detail">
+            <strong>Skills Required:</strong> {{ project.skills or 'Knowledge of aerodynamics, propulsion systems, and stability analysis' }}
+        </div>
+        <hr>
+        <div class="project-detail">
+            <strong>Description:</strong> {{ project.description }}
+        </div>
+        <div class="apply-button-container">
+            <form method="POST" action="/projects/{{ project.id }}/apply">
+                <button type="submit" class="apply-button">Apply</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

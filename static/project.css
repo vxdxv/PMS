@@ -1,0 +1,126 @@
+body {
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    background-color: white;
+}
+
+.container {
+    display: flex;
+    transition: margin-left 0.3s ease;
+}
+
+.menu-icon {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    font-size: 24px;
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.navbar {
+    width: 70px;
+    background-color: #D5006D;
+    color: white;
+    height: 100vh;
+    overflow: auto;
+    transition: width 0.3s ease;
+    padding-top: 60px;
+    padding-right: 40px;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.navbar.active {
+    width: 220px;
+}
+
+.navbar h2 {
+    margin: 0;
+    padding: 20px;
+    font-size: 20px;
+    display: none;
+}
+
+.navbar.active h2 {
+    display: block;
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.navbar ul li {
+    padding: 12px 20px;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.navbar button {
+    background-color: #D5006D;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.main-content {
+    margin-left: 60px;
+    padding: 40px;
+    flex-grow: 1;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.shifted {
+    margin-left: 220px;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.small-text {
+    font-size: 0.9em;
+    color: gray;
+    margin-bottom: 15px;
+}
+
+.project-info {
+    margin-bottom: 20px;
+}
+
+.project-detail {
+    margin: 10px 0;
+}
+
+hr {
+    border: 1px solid #ccc;
+    margin: 15px 0;
+}
+
+.apply-button-container {
+    margin-top: 20px;
+}
+
+.apply-button {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.apply-button:hover {
+    background-color: #444;
+}

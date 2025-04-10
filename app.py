@@ -181,8 +181,8 @@ def student_dashboard():
         
 
         # Filter projects based on accepted/pending status
-            accepted_projects_list = [p for p in projects if p['project_id'] in accepted_project_ids]
-            pending_projects_list = [p for p in projects if p['project_id'] in pending_project_ids]
+            accepted_projects_list = [p for p in projects if p['id'] in accepted_project_ids]
+            pending_projects_list = [p for p in projects if p['id'] in pending_project_ids]
         
 
         # Filter accepted and pending applications
@@ -312,26 +312,39 @@ def search_projects():
     finally:
         cursor.close()
         connection.close()
-
 @app.route('/projects/<int:project_id>/apply', methods=['POST'])
 def apply_to_project(project_id):
     if 'user_id' not in session or session['role'] != 'student':
         return jsonify({'error': 'Unauthorized'}), 401
-    
-    data = request.get_json()
+
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
-    
+
     cursor = connection.cursor()
-    
     try:
+        cursor.execute('''
+            SELECT * FROM applications 
+            WHERE student_id = %s AND project_id = %s
+        ''', (session['user_id'], project_id))
+        existing_application = cursor.fetchone()
+
+        if existing_application:
+            return jsonify({'error': 'You have already applied for this project.'}), 400
+        # Fetch resume from users table
+        cursor.execute('SELECT resume_link FROM users WHERE id = %s', (session['user_id'],))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({'error': 'Resume not found'}), 404
+        resume = result[0]
+
+        # Insert application
         cursor.execute('''
             INSERT INTO applications (student_id, project_id, resume) 
             VALUES (%s, %s, %s)
-        ''', (session['user_id'], project_id, data['resume']))
+        ''', (session['user_id'], project_id, resume))
         connection.commit()
-        return jsonify({'message': 'Application submitted'}), 201
+        return redirect('/student-dashboard')
     except Error as e:
         return jsonify({'error': str(e)}), 400
     finally:
@@ -441,8 +454,28 @@ def get_professor_projects():
         cursor.close()
         connection.close()
 @app.route('/projects/<int:project_id>', methods=['GET'])
-def get_project(project_id):
-    return render_template("manageProject.html")
+def view_project(project_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        cursor.execute('SELECT * FROM projects WHERE id = %s', (project_id,))
+        project = cursor.fetchone()
+        if not project:
+            return jsonify({'error': 'Project not found'}), 404
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+    return render_template('project_view.html', project=project)
 
 @app.route('/projects/<int:project_id>', methods=['PUT'])
 def update_project(project_id):
