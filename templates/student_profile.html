@@ -59,7 +59,7 @@
                 {% for project in user.projects %}
                     <div class="project-card">
                         <strong>{{ project.title }}</strong>
-                        <p><strong>Role:</strong> {{ project.role }}</p>
+                        <p><strong>domain:</strong> {{ project.domain }}</p>
                     </div>
                 {% endfor %}
                 {% if not user.projects: %}

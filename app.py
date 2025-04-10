@@ -13,7 +13,7 @@ app.secret_key = 'SECRET_KEY'
 db_config = {
     'host': "localhost",
     'user': "root",
-    'password': "pass",
+    'password': "B220584cs*",
     'database': "world"
 }
 
@@ -165,7 +165,7 @@ def student_dashboard():
         pending_applications=0
         pending_projects_list={}
         # Get all projects
-        cursor.execute('SELECT * FROM projects')
+        cursor.execute('SELECT * FROM projects  where status="open"')
         projects = cursor.fetchall()
         if(len(applications)>0):
             accepted_applications_list = [app for app in applications if app['status'] == 'accepted']
@@ -251,7 +251,7 @@ def student_profile():
     try:
         cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
         user = cursor.fetchone()
-        cursor.execute('SELECT * FROM projects WHERE student_id = %s', (session['user_id'],))
+        cursor.execute('SELECT * FROM projects WHERE id IN (SELECT project_id FROM applications WHERE student_id = %s) and status="closed"', (session['user_id'],))
         projects = cursor.fetchall()
         if projects:
             user['projects'] = projects
