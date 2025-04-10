@@ -55,6 +55,51 @@ body {
 .sidebar button:hover {
     background-color: #e3e3e3;
 }
+
+.menu-icon {
+    cursor: pointer;
+    font-size: 30px; 
+    padding: 10px; 
+    background-color: #f0f0f0;
+    border-radius: 5px; 
+    transition: background-color 0.3s;
+}
+
+.menu-icon:hover {
+    background-color: #e0e0e0; 
+}
+
+.menu-icon i {
+    color: #333; 
+    font-weight: bold; 
+}
+
+.navbar {
+    background-color: #D5006D; 
+    color: white;
+    width: 250px;
+    padding: 20px;
+}
+
+.navbar h2 {
+    margin: 0;
+    padding-bottom: 20px;
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.navbar ul li {
+    margin: 15px 0;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
 /* Top Banner */
 .top-banner {
     background: linear-gradient(90deg, #ff7eb3, #ff758c, #ff7eb3);
