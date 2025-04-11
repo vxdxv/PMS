@@ -105,7 +105,14 @@ body {
     text-decoration: none;
 }
 
-
+.navbar button {
+    background-color: #D5006D;
+    color: white;
+    border: none;
+    font-size: medium;
+    border-radius: 4px;
+    cursor: pointer;
+}
 /* Main Profile */
 .profile {
     margin: 5px 20px;

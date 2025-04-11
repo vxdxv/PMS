@@ -99,19 +99,7 @@
       <label for="resume">Resume Link</label>
       <input type="url" id="resume" name="resume_link" value="{{ user.resume_link }}"/>
 
-      <!-- Projects -->
-      <label>Projects</label>
-      <div id="projects-container">
-        {% for project in user.projects %}
-          <div class="project-item">
-            <input type="text" name="project_titles[]" value="{{ project.title }}" required />
-            <input type="text" name="project_links[]" value="{{ project.link }}" required />
-            <button type="button" class="remove-project-btn" onclick="this.parentElement.remove()">Remove</button>
-          </div>
-        {% endfor %}
-      </div>
-      <button type="button" id="add-project-btn">Add Project</button>
-
+      
       <!-- Save Button -->
       <button type="submit" class="save-btn">Save Changes</button>
     </form>

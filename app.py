@@ -8,7 +8,7 @@ app.secret_key = 'SECRET_KEY'
 db_config = {
     'host': "localhost",
     'user': "root",
-    'password': "B220584cs*",
+    'password': "pass",
     'database': "world"
 }
 
@@ -249,9 +249,9 @@ def professor_dashboard():
         user = {
             'name': professor_name,
             'accepted_applications': len(accepted_projects_list),
-            'accepted_applications_list': accepted_projects_list,
+            'accepted_applications_list': accepted_applications,
             'pending_applications': len(pending_applications),
-            'pending_applications_list': pending_projects_list
+            'pending_applications_list': pending_applications
         }
 
         response = {
@@ -283,7 +283,7 @@ def student_profile():
     try:
         cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
         user = cursor.fetchone()
-        cursor.execute('SELECT * FROM projects WHERE id IN (SELECT project_id FROM applications WHERE student_id = %s) and status="closed"', (session['user_id'],))
+        cursor.execute('SELECT * FROM projects WHERE id IN (SELECT project_id FROM applications WHERE student_id = %s and status="accepted") and status="closed"', (session['user_id'],))
         projects = cursor.fetchall()
         if projects:
             user['projects'] = projects
@@ -425,7 +425,25 @@ def professor_profile():
         cursor.close()
         connection.close()
         return render_template("professor_profile.html", user=user)
-    
+@app.route('/update-profile-prof', methods=['GET'])
+def update_profile_prof():
+    if 'user_id' not in session or session['role'] != 'professor':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT * FROM users WHERE id = %s', (session['user_id'],))
+        user = cursor.fetchone()
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+        return render_template("update_profile_prof.html", user=user)
 @app.route('/update-profile-student', methods=['GET', 'POST'])
 def update_profile_student():
     if 'user_id' not in session or session['role'] != 'student':
@@ -607,19 +625,35 @@ def get_applications():
         cursor.close()
         connection.close()
 
-@app.route('/applications/<int:application_id>', methods=['PUT'])
-def update_application(application_id):
+@app.route('/applications/<int:application_id>/accept', methods=['POST'])
+def accept_application(application_id):
     if 'user_id' not in session or session['role'] != 'professor':
         return jsonify({'error': 'Unauthorized'}), 401
-    
-    data = request.get_json()
+
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
-    
+
     cursor = connection.cursor()
-    
+
     try:
+        # Step 1: Fetch current status from DB
+        cursor.execute('''
+            SELECT a.status FROM applications a
+            JOIN projects p ON a.project_id = p.id
+            WHERE a.id = %s AND p.professor_id = %s
+        ''', (application_id, session['user_id']))
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({'error': 'Application not found or access denied'}), 404
+
+        current_status = row[0]
+
+        # Step 2: Determine new status (example: toggle status)
+        new_status = 'accepted' if current_status == 'pending' else 'pending'
+
+        # Step 3: Update application
         cursor.execute('''
             UPDATE applications 
             SET status = %s
@@ -627,9 +661,58 @@ def update_application(application_id):
                 SELECT 1 FROM projects 
                 WHERE id = applications.project_id AND professor_id = %s
             )
-        ''', (data['status'], application_id, session['user_id']))
+        ''', (new_status, application_id, session['user_id']))
         connection.commit()
-        return jsonify({'message': 'Application updated'}), 200
+        
+        return redirect('/professor-dashboard')
+
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/applications/<int:application_id>/reject', methods=['POST'])
+def reject_application(application_id):
+    if 'user_id' not in session or session['role'] != 'professor':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = connection.cursor()
+
+    try:
+        # Step 1: Fetch current status from DB
+        cursor.execute('''
+            SELECT a.status FROM applications a
+            JOIN projects p ON a.project_id = p.id
+            WHERE a.id = %s AND p.professor_id = %s
+        ''', (application_id, session['user_id']))
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({'error': 'Application not found or access denied'}), 404
+
+        current_status = row[0]
+
+        # Step 2: Determine new status (example: toggle status)
+        new_status = 'rejected' if current_status == 'pending' else 'pending'
+
+        # Step 3: Update application
+        cursor.execute('''
+            UPDATE applications 
+            SET status = %s
+            WHERE id = %s AND EXISTS (
+                SELECT 1 FROM projects 
+                WHERE id = applications.project_id AND professor_id = %s
+            )
+        ''', (new_status, application_id, session['user_id']))
+        connection.commit()
+        
+        return redirect('/professor-dashboard')
+
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:

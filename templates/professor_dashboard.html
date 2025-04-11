@@ -62,10 +62,10 @@
                 {% for project in response.user.accepted_applications_list %}
                     <div class="project-card">
                         <h3>{{ project.title }}</h3>
-                        <p><strong>Domain:</strong> {{ project.domain }}</p>
-                        <p><strong>Student Name:</strong> {{ project.student_name }}</p>
+                        <p><strong>Domain:</strong> {{ project.project_id }}</p>
+                        <p><strong>Student Name:</strong> {{ project.student_id }}</p>
                         <p><strong>Resume:</strong> 
-                            <a href="{{ project.student_resume }}" target="_blank">View Resume</a>
+                            <a href="{{ project.resume }}" target="_blank">View Resume</a>
                         </p>
                     </div>
                 {% endfor %}
@@ -78,14 +78,15 @@
                 {% for application in response.user.pending_applications_list %}
                     <div class="project-card">
                         <h3>{{ application.title }}</h3>
-                        <p><strong>Domain:</strong> {{ application.domain }}</p>
-                        <p><strong>Student Name:</strong> {{ application.student_name }}</p>
+                        <p><strong>Domain:</strong> {{ application.project_id }}</p>
+                        <p><strong>Student Name:</strong> {{ application.student_id }}</p>
                         <p><strong>Resume:</strong> 
-                            <a href="{{ application.student_resume }}" target="_blank">View Resume</a>
+                            <a href="{{ application.resume }}" target="_blank">View Resume</a>
                         </p>
-                        <form action="/applications/{{ application.id }}" method="put">
+                        <form action="/applications/{{ application.id }}/accept" method="post">
                         <button class="accept" type="submit" data-id="{{ application.id }}" data-status="accepted">Accept</button>
-                   
+                    </form>
+                    <form action="/applications/{{ application.id }}/reject" method="post">
                         <button class="reject" type="submit" data-id="{{ application.id }}" data-status="rejected">Reject</button>
                     </form>
                     </div>

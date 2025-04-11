@@ -99,7 +99,14 @@ body {
     color: white;
     text-decoration: none;
 }
-
+.navbar button {
+    background-color: #D5006D;
+    color: white;
+    border: none;
+    font-size: medium;
+    border-radius: 4px;
+    cursor: pointer;
+}
 /* Top Banner */
 .top-banner {
     background: linear-gradient(90deg, #ff7eb3, #ff758c, #ff7eb3);

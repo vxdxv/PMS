@@ -27,8 +27,9 @@
                 <li><a href="/student/profile">View Profile</a></li>
                 <!-- <li><a href="Create.html">Create Project</a></li>
                 <li><a href="manageProject.html">Manage Projects</a></li> -->
-
-                <li><a href="/">Logout</a></li>
+                <form action="/logout" method="POST">
+                    <button type="submit">Logout</a></li>
+                </form>
             </ul>
             
         </nav>
@@ -56,7 +57,7 @@
                     <div class="project-card">
                         <h3>{{ project.title }}</h3>
                         <p><strong>Domain:</strong> {{ project.domain }}</p>
-                        <p><strong>Professor:</strong> {{ project.professor }}</p>
+                        <p><strong>Professor:</strong> {{ project.professor_id }}</p>
                     </div>
                 {% endfor %}
             </div>
@@ -69,7 +70,7 @@
                     <div class="project-card">
                         <h3>{{ project.title }}</h3>
                         <p><strong>Domain:</strong> {{ project.domain }}</p>
-                        <p><strong>Professor:</strong> {{ project.professor }}</p>
+                        <p><strong>Professor:</strong> {{ project.professor_id }}</p>
                     </div>
                 {% endfor %}
             </div>

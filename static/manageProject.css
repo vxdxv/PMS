@@ -10,7 +10,14 @@ body {
     display: flex;
     width: 100%;
 }
-
+.navbar button {
+    background-color: #D5006D;
+    color: white;
+    border: none;
+    font-size: medium;
+    border-radius: 4px;
+    cursor: pointer;
+}
 .menu-icon {
     cursor: pointer;
     font-size: 30px; 
@@ -32,8 +39,8 @@ body {
 .navbar {
     background-color: #D5006D; 
     color: white;
-    width: 750px;
-    padding: 20px;
+    width: 800px;
+    padding: 10px;
 }
 
 .navbar h2 {
@@ -58,6 +65,7 @@ body {
 .main-content {
     flex-grow: 1;
     padding: 20px;
+    margin: 50px;
 }
 
 h1 {
@@ -81,7 +89,9 @@ h2{
     margin: 20px 0;
     padding: 10px 0; 
 }
-
+.projects-list{
+    margin-left:20px
+}
 .slots-left, .deadline {
     font-size: 1em; 
 }
@@ -90,7 +100,10 @@ hr {
     border: 1px solid black; 
     margin: 20px 0; 
 }
-
+.project-actions{
+    display: flex;
+    gap: 5px;
+}
 .project-detail {
     margin: 15px 0; 
     padding: 5px 0; 
