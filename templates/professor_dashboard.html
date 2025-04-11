@@ -26,13 +26,18 @@
             <ul>
                 <li><a href="professor_dashboard.html">Dashboard</a></li>
                 <li><a href="professor_profile.html">View Profile</a></li>
-                <li><a href="Create.html">Create Project</a></li>
-                <li><a href="manageProject.html">Manage Projects</a></li>
+                <li><form action="/add-projects" method="GET">
+                    <button type="submit">Create Project</button>
+                </form></li>
+                <li>
+                    <form action="/manage-projects" method="GET">
+                        <button type="submit">Manage Project</button>
+                    </form>
                 <li><a href="login.html">Logout</a></li>
             </ul>
         </nav>
     </aside>
-
+    {% if user %}
     <main class="dashboard-container">
         <header class="top-banner">
             <h2>Hey, {{ user.name }}!</h2>
@@ -52,13 +57,13 @@
         <section class="projects-list">
             <h2>Applications Accepted</h2>
             <div class="projects-grid">
-                {% for appln in user.accepted_applications_list %}
+                {% for project in user.accepted_applications_list %}
                     <div class="project-card">
                         <h3>{{ project.title }}</h3>
                         <p><strong>Domain:</strong> {{ project.domain }}</p>
-                        <p><strong>Student Name:</strong> {{ student.name }}</p>
+                        <p><strong>Student Name:</strong> {{ project.student_name }}</p>
                         <p><strong>Resume:</strong> 
-                            <a href="{{ student.resume }}" target="_blank">View Resume</a>
+                            <a href="{{ project.student_resume }}" target="_blank">View Resume</a>
                         </p>
                     </div>
                 {% endfor %}
@@ -68,13 +73,13 @@
         <section class="projects-list">
             <h2>Applications to review</h2>
             <div class="projects-grid">
-                {% for appln in user.pending_applications_list %}
+                {% for project in user.pending_applications_list %}
                     <div class="project-card">
                         <h3>{{ project.title }}</h3>
                         <p><strong>Domain:</strong> {{ project.domain }}</p>
-                        <p><strong>Student Name:</strong> {{ student.name }}</p>
+                        <p><strong>Student Name:</strong> {{ project.student_name }}</p>
                         <p><strong>Resume:</strong> 
-                            <a href="{{ student.resume }}" target="_blank">View Resume</a>
+                            <a href="{{ project.student_resume }}" target="_blank">View Resume</a>
                         </p>
                         <button class="accept" onclick=""> Accept </button>
                         <button class="reject" onclick=""> Reject </button>
@@ -82,7 +87,8 @@
                 {% endfor %}
             </div>
         </section>
-    </main>
+    </main> 
+    {% endif %}
 </body>
 </html>
 
