@@ -26,6 +26,32 @@ body {
     font-weight: bold; 
 }
 
+.navbar {
+    background-color: #D5006D; 
+    color: white;
+    width: 250px;
+    padding: 20px;
+}
+
+.navbar h2 {
+    margin: 0;
+    padding-bottom: 20px;
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.navbar ul li {
+    margin: 15px 0;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
 
 /* Sidebar */
 .sidebar {
