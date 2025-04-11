@@ -24,12 +24,21 @@
         <div class="menu-icon"><i class="fas fa-bars"></i></div>
         <nav class="navbar">
             <h2>TaskFlow</h2>
-           <ul>
-                <li><a href="professor_dashboard.html">Dashboard</a></li>
-                <li><a href="professor_profile.html">View Profile</a></li>
-                <li><a href="Create.html">Create Project</a></li>
-                <li><a href="manageProject.html">Manage Projects</a></li>
-                <li><a href="login.html">Logout</a></li>
+            <ul>
+                <li><a href="/professor-dashboard">Dashboard</a></li>
+                <li><a href="/professor/profile">View Profile</a></li>
+                <li><form action="/add-projects" method="GET">
+                    <button type="submit">Create Project</button>
+                </form></li>
+                <li>
+                    <form action="/manage-projects" method="GET">
+                        <button type="submit">Manage Project</button>
+                    </form>
+                <li>
+                    <form action="/logout" method="POST">
+                        <button type="submit">Logout</a></li>
+                    </form>
+                    
             </ul>
 
         </nav>
@@ -41,11 +50,16 @@
                 <p><strong>Deadline:</strong> {{ project.deadline }}</p>
                 <p><strong>Vacancies:</strong> {{ project.vacancies }}</p>
                 <div class="project-actions">
-                    <button class="apply-button">Edit</button>
-                    <button class="apply-button delete-button">Delete</button>
+                    <form action="/projects/{{project.id}}/close" method="POST">
+                        <button type="submit" class="apply-button delete-button">Delete</button>
+                    </form>
+                    <form action="/edit-project/{{ project.id }}" method="GET">
+                        <button type="submit" class="apply-button">Edit</button>
+                    </form>
+                  
                 </div>
             </div>
-            <hr>
+            <hr width="1200">
             {% endfor %}
         </div>
         

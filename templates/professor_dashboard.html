@@ -23,8 +23,8 @@
         <nav class="navbar">
             <h2>TaskFlow</h2>
             <ul>
-                <li><a href="professor_dashboard.html">Dashboard</a></li>
-                <li><a href="professor_profile.html">View Profile</a></li>
+                <li><a href="/professor-dashboard">Dashboard</a></li>
+                <li><a href="/professor/profile">View Profile</a></li>
                 <li><form action="/add-projects" method="GET">
                     <button type="submit">Create Project</button>
                 </form></li>
@@ -32,30 +32,34 @@
                     <form action="/manage-projects" method="GET">
                         <button type="submit">Manage Project</button>
                     </form>
-                <li><a href="login.html">Logout</a></li>
+                <li>
+                    <form action="/logout" method="POST">
+                        <button type="submit">Logout</a></li>
+                    </form>
+                    
             </ul>
           
         </nav>
     <main class="dashboard-container">
         <header class="top-banner">
-            <h2>Hey, {{ user.name }}!</h2>
+            <h2>Hey, {{ response.user.name }}!</h2>
         </header>
 
         <section class="overview">
             <div class="overview-box">
                 <h3> Applications Accepted </h3>
-                <p>{{ user.accepted_applications }}</p>
+                <p>{{ response.user.accepted_applications }}</p>
             </div>
             <div class="overview-box">
                 <h3> Applications to review </h3>
-                <p>{{ user.pending_applications }}</p>
+                <p>{{ response.user.pending_applications }}</p>
             </div>
         </section>
 
         <section class="projects-list">
             <h2>Applications Accepted</h2>
             <div class="projects-grid">
-                {% for project in user.accepted_applications_list %}
+                {% for project in response.user.accepted_applications_list %}
                     <div class="project-card">
                         <h3>{{ project.title }}</h3>
                         <p><strong>Domain:</strong> {{ project.domain }}</p>
@@ -71,22 +75,26 @@
         <section class="projects-list">
             <h2>Applications to review</h2>
             <div class="projects-grid">
-                {% for project in user.pending_applications_list %}
+                {% for application in response.user.pending_applications_list %}
                     <div class="project-card">
-                        <h3>{{ project.title }}</h3>
-                        <p><strong>Domain:</strong> {{ project.domain }}</p>
-                        <p><strong>Student Name:</strong> {{ project.student_name }}</p>
+                        <h3>{{ application.title }}</h3>
+                        <p><strong>Domain:</strong> {{ application.domain }}</p>
+                        <p><strong>Student Name:</strong> {{ application.student_name }}</p>
                         <p><strong>Resume:</strong> 
-                            <a href="{{ project.student_resume }}" target="_blank">View Resume</a>
+                            <a href="{{ application.student_resume }}" target="_blank">View Resume</a>
                         </p>
-                        <button class="accept" onclick=""> Accept </button>
-                        <button class="reject" onclick=""> Reject </button>
+                        <form action="/applications/{{ application.id }}" method="put">
+                        <button class="accept" type="submit" data-id="{{ application.id }}" data-status="accepted">Accept</button>
+                   
+                        <button class="reject" type="submit" data-id="{{ application.id }}" data-status="rejected">Reject</button>
+                    </form>
                     </div>
                 {% endfor %}
             </div>
         </section>
+        
     </main> 
-    {% endif %}
+    
 </body>
 </html>
 

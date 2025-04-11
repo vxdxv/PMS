@@ -8,7 +8,7 @@ app.secret_key = 'SECRET_KEY'
 db_config = {
     'host': "localhost",
     'user': "root",
-    'password': "1234",
+    'password': "B220584cs*",
     'database': "world"
 }
 
@@ -215,61 +215,59 @@ def professor_dashboard():
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = connection.cursor(dictionary=True)
-    response = {}  
 
     try:
-        cursor.execute("SELECT id FROM projects WHERE professor_id = %s", (session['user_id'],))
-        id_list = cursor.fetchall()
+        # Step 1: Get professor's projects
+        cursor.execute("SELECT * FROM projects WHERE professor_id = %s", (session['user_id'],))
+        professor_projects = cursor.fetchall()
+
+        # Step 2: Get all applications for these projects
         applications = []
-        for i in id_list:
-            cursor.execute('SELECT * FROM applications WHERE project_id= %s', (i['id'],))
-            applications.append(cursor.fetchall())
-        print(applications)
-        accepted_projects=0
-        accepted_projects_list={}
-        pending_applications=0
-        pending_projects_list={}
-        cursor.execute('SELECT * FROM projects')
-        projects = cursor.fetchall()
-        if(len(applications)>0):
-            accepted_applications_list = [app for app in applications if app['status'] == 'accepted']
-            pending_applications_list = [app for app in applications if app['status'] == 'pending']
+        project_ids = [p['id'] for p in professor_projects]
 
-            accepted_projects = len(accepted_applications_list)
-            pending_applications = len(pending_applications_list)
+        for pid in project_ids:
+            cursor.execute("SELECT * FROM applications WHERE project_id = %s", (pid,))
+            apps = cursor.fetchall()
+            applications.extend(apps)  # flatten the list
 
-            accepted_project_ids = [app['project_id'] for app in accepted_applications_list]
-            pending_project_ids = [app['project_id'] for app in pending_applications_list]
+        # Step 3: Separate accepted and pending applications
+        accepted_applications = [app for app in applications if app['status'] == 'accepted']
+        pending_applications = [app for app in applications if app['status'] == 'pending']
 
-    
-            accepted_projects_list = [p for p in projects if p['project_id'] in accepted_project_ids]
-            pending_projects_list = [p for p in projects if p['project_id'] in pending_project_ids]
-        
+        accepted_project_ids = list(set([app['project_id'] for app in accepted_applications]))
+        pending_project_ids = list(set([app['project_id'] for app in pending_applications]))
 
-        cursor.execute("SELECT name FROM users WHERE id= %s", (session['user_id'],))
+        accepted_projects_list = [p for p in professor_projects if p['id'] in accepted_project_ids]
+        pending_projects_list = [p for p in professor_projects if p['id'] in pending_project_ids]
+
+        # Step 4: Get professor's name
+        cursor.execute("SELECT name FROM users WHERE id = %s", (session['user_id'],))
         name_result = cursor.fetchone()
-        student_name = name_result['name'] if name_result else 'Unknown'
+        professor_name = name_result['name'] if name_result else 'Unknown'
 
+        # Step 5: Final response
         user = {
-            'name': student_name,
-            'accepted_projects': accepted_projects,
-            'accepted_projects_list': accepted_projects_list,
-            'pending_applications': pending_applications,
-            'pending_projects_list': pending_projects_list
+            'name': professor_name,
+            'accepted_applications': len(accepted_projects_list),
+            'accepted_applications_list': accepted_projects_list,
+            'pending_applications': len(pending_applications),
+            'pending_applications_list': pending_projects_list
         }
 
         response = {
             'user': user,
-            'available_projects': projects
+            'available_projects': professor_projects
         }
+
+        return render_template("professor_dashboard.html", response=response)
 
     except Error as e:
         return jsonify({'error': str(e)}), 500
+
     finally:
         cursor.close()
         connection.close()
 
-    return render_template("professor_dashboard.html", response=response)
 
 @app.route('/student/profile', methods=['GET'])
 def student_profile():
@@ -358,7 +356,7 @@ def manage_projects():
     cursor = connection.cursor(dictionary=True)
 
     try:
-        cursor.execute('SELECT * FROM projects WHERE professor_id = %s', (session['user_id'],))
+        cursor.execute('SELECT * FROM projects WHERE professor_id = %s and status="open"', (session['user_id'],))
         projects = cursor.fetchall()
         print(projects)
         return render_template("manageProject.html", projects=projects)
@@ -577,7 +575,7 @@ def close_project(project_id):
             WHERE id = %s AND professor_id = %s
         ''', (project_id, session['user_id']))
         connection.commit()
-        return jsonify({'message': 'Project closed'}), 200
+        return redirect("/manage-projects")
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
