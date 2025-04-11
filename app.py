@@ -1,19 +1,14 @@
 from flask import Flask, request, jsonify, session,render_template,redirect,flash
 import mysql.connector
 from mysql.connector import Error
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 
-# Database configuration
 db_config = {
     'host': "localhost",
     'user': "root",
-    'password': "B220584cs*",
+    'password': "1234",
     'database': "world"
 }
 
@@ -22,7 +17,7 @@ db_config = {
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return redirect('/')
+    return render_template("login.html")
 #approve and reject application endpoint
 #add max applicants,deadine,skills required
 #professor-add areas of interest
@@ -44,7 +39,6 @@ def init_db():
     if connection:
         cursor = connection.cursor()
         
-        # Create tables
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -62,7 +56,8 @@ def init_db():
                 description TEXT,
                 domain VARCHAR(255),
                 status ENUM('open', 'closed') DEFAULT 'open',
-                professor_id INT NOT NULL,
+                vacancies INT,
+                deadline DATE,
                 FOREIGN KEY(professor_id) REFERENCES users(id)
             )
         ''')
@@ -85,7 +80,6 @@ def init_db():
 
 init_db()
 
-# Authentication routes
 @app.route('/')
 def default():
     return render_template("login.html")
@@ -97,7 +91,7 @@ def get_register():
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.form  # Use form data instead of JSON
+    data = request.form  
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
@@ -108,7 +102,7 @@ def register():
         cursor.execute('INSERT INTO users (email, password, name, role) VALUES (%s, %s, %s, %s)',
                      (data['email'], data['password'], data.get('name'), data['role']))
         connection.commit()
-        return redirect("/")  # Redirect after successful registration
+        return redirect("/") 
     except Error as e:
         return jsonify({'error': str(e)}), 400
     finally:
@@ -141,6 +135,8 @@ def login():
     finally:
         cursor.close()
         connection.close()
+        if user['role'] == 'professor':
+            return redirect("/professor-dashboard")
         return redirect("/student-dashboard")
 
 @app.route('/student-dashboard', methods=['GET'])
@@ -153,10 +149,9 @@ def student_dashboard():
         return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = connection.cursor(dictionary=True)
-    response = {}  # Declare response early so it's always defined
+    response = {}  
 
     try:
-        # Fetch all applications for the logged-in student
         cursor.execute('SELECT * FROM applications WHERE student_id= %s', (session['user_id'],))
         applications = cursor.fetchall()
         print(applications)
@@ -174,7 +169,6 @@ def student_dashboard():
             accepted_projects = len(accepted_applications_list)
             pending_applications = len(pending_applications_list)
 
-        # Get project ids from accepted and pending apps
             accepted_project_ids = [app['project_id'] for app in accepted_applications_list]
             pending_project_ids = [app['project_id'] for app in pending_applications_list]
 
@@ -185,10 +179,6 @@ def student_dashboard():
             pending_projects_list = [p for p in projects if p['id'] in pending_project_ids]
         
 
-        # Filter accepted and pending applications
-       
-
-        # Get student name
         cursor.execute("SELECT name FROM users WHERE id= %s", (session['user_id'],))
         name_result = cursor.fetchone()
         student_name = name_result['name'] if name_result else 'Unknown'
@@ -214,29 +204,73 @@ def student_dashboard():
 
     return render_template("student_dashboard.html", response=response)
 
-
+#correct this, accept/reject 
 @app.route('/professor-dashboard', methods=['GET'])
 def professor_dashboard():
-    if 'user_id' not in session or session['role'] != 'student':
+    if 'user_id' not in session or session['role'] != 'professor':
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
-    
+
     cursor = connection.cursor(dictionary=True)
-    
+    response = {}  
+
     try:
-        cursor.execute('SELECT * FROM projects WHERE professor_id= %s', (session['user_id'],))
+        cursor.execute("SELECT id FROM projects WHERE professor_id = %s", (session['user_id'],))
+        id_list = cursor.fetchall()
+        applications = []
+        for i in id_list:
+            cursor.execute('SELECT * FROM applications WHERE project_id= %s', (i['id'],))
+            applications.append(cursor.fetchall())
+        print(applications)
+        accepted_projects=0
+        accepted_projects_list={}
+        pending_applications=0
+        pending_projects_list={}
+        cursor.execute('SELECT * FROM projects')
         projects = cursor.fetchall()
+        if(len(applications)>0):
+            accepted_applications_list = [app for app in applications if app['status'] == 'accepted']
+            pending_applications_list = [app for app in applications if app['status'] == 'pending']
+
+            accepted_projects = len(accepted_applications_list)
+            pending_applications = len(pending_applications_list)
+
+            accepted_project_ids = [app['project_id'] for app in accepted_applications_list]
+            pending_project_ids = [app['project_id'] for app in pending_applications_list]
+
+    
+            accepted_projects_list = [p for p in projects if p['project_id'] in accepted_project_ids]
+            pending_projects_list = [p for p in projects if p['project_id'] in pending_project_ids]
+        
+
+        cursor.execute("SELECT name FROM users WHERE id= %s", (session['user_id'],))
+        name_result = cursor.fetchone()
+        student_name = name_result['name'] if name_result else 'Unknown'
+
+        user = {
+            'name': student_name,
+            'accepted_projects': accepted_projects,
+            'accepted_projects_list': accepted_projects_list,
+            'pending_applications': pending_applications,
+            'pending_projects_list': pending_projects_list
+        }
+
+        response = {
+            'user': user,
+            'available_projects': projects
+        }
+
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
         cursor.close()
         connection.close()
-        return render_template("professor_dashboard.html", projects=projects)
 
-# Student routes
+    return render_template("professor_dashboard.html", response=response)
+
 @app.route('/student/profile', methods=['GET'])
 def student_profile():
     if 'user_id' not in session or session['role'] != 'student':
@@ -264,7 +298,6 @@ def student_profile():
         connection.close()
         return render_template("student_profile.html",user=user)
 
-#Add project route
 @app.route('/add-projects', methods=['GET'])
 def add_projects():
     if 'user_id' not in session or session['role'] != 'professor':
@@ -274,7 +307,7 @@ def add_projects():
 
 @app.route('/add-project', methods=['POST'])
 def add_project():
-    data = request.get_json()
+    data = request.form
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
@@ -283,10 +316,10 @@ def add_project():
     
     try:
         if(session['role'] == 'professor'):
-            cursor.execute('INSERT INTO projects (title, description, domain, professor_id) VALUES (%s, %s, %s, %s)',
-                     (data['title'], data['description'], data.get('domain'), session['user_id']))
+            cursor.execute('INSERT INTO projects (title, description, domain, deadline, vacancies, professor_id) VALUES (%s, %s, %s, %s, %s, %s)',
+                     (data['project-title'], data['description'], data.get('role'), data['deadline'], data['vacancies'], session['user_id'],))
             connection.commit()
-            return jsonify({'message': 'Created project successfully'}), 200
+            return redirect("/professor-dashboard")
     except Error as e:
         return jsonify({'error': str(e)}), 400
     finally:
@@ -307,6 +340,28 @@ def search_projects():
         cursor.execute('SELECT * FROM projects WHERE domain = %s AND status = "open"', (domain,))
         projects = cursor.fetchall()
         return jsonify(projects), 200
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/manage-projects', methods=['GET'])
+def manage_projects():
+    if 'user_id' not in session or session['role'] != 'professor':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        cursor.execute('SELECT * FROM projects WHERE professor_id = %s', (session['user_id'],))
+        projects = cursor.fetchall()
+        print(projects)
+        return render_template("manageProject.html", projects=projects)
     except Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
@@ -351,7 +406,6 @@ def apply_to_project(project_id):
         cursor.close()
         connection.close()
 
-# Professor routes
 @app.route('/professor/profile', methods=['GET'])
 def professor_profile():
     if 'user_id' not in session or session['role'] != 'professor':

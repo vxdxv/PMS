@@ -34,38 +34,22 @@
                 <li><a href="logout.html" class="logout">Logout</a></li>
             </ul>
         </nav>
-
-        <div class="main-content">
-            <h1>Development of an Autonomous Delivery Drone</h1>
-            <p class="small-text">1652 Applicants</p>
-            <div class="project-info">
-                <div class="slots-left">
-                    <strong>Only 3 Slots Left!</strong> 
+        <div class="projects-list">
+            {% for project in projects %}
+            <div class="project-card">
+                <h2>{{ project.title }}</h2>
+                <p><strong>Description:</strong> {{ project.description }}</p>
+                <p><strong>Deadline:</strong> {{ project.deadline }}</p>
+                <p><strong>Vacancies:</strong> {{ project.vacancies }}</p>
+                <div class="project-actions">
+                    <button class="apply-button">Edit</button>
+                    <button class="apply-button delete-button">Delete</button>
                 </div>
             </div>
-
-            <h2>Project Details</h2>
             <hr>
-            <div class="project-detail">
-                <strong>Professor:</strong> Dr.Ankit Rajera
-            </div>
-            <hr>
-            <div class="project-detail">
-                <strong>Role:</strong>  Project Manager
-            </div>
-            <hr>
-            <div class="project-detail">
-                <strong>Skills Required:</strong> Knowledge of aerodynamics, propulsion systems, and stability analysis
-            </div>
-            <hr>
-            <div class="project-detail">
-                <strong>Description:</strong> The Design and Development of an Autonomous Delivery Drone project focuses on creating a fully autonomous drone system for delivering goods efficiently. The project involves designing the drone's hardware, including the flight system, sensors, and battery, as well as developing the software for navigation, obstacle avoidance, and real-time communication. The goal is to create a cost-effective, safe, and reliable delivery solution that operates with minimal human intervention, enhancing speed and reducing costs in logistics and e-commerce industries.
-            </div>
-             <div class="apply-button-container">
-                <button class="apply-button">Edit</button>
-                <button class="apply-button delete-button">Delete</button>
-            </div>
+            {% endfor %}
         </div>
+        
     </div>
 </body>
 </html>
